@@ -20,13 +20,13 @@ Dynamixel Network module
 
 """
 
-import defs
-import stream
-import event_handler
+from . import defs
+from . import stream
+from . import event_handler
 import time
-import dynamixel
+# from . import dynamixel
 
-from defs import DEVICE
+from .defs import DEVICE
 
 AX12 = DEVICE['AX12']
 AXS1 = DEVICE['AXS1']
@@ -56,7 +56,7 @@ class DynamixelInterface(object):
         """ Returns a list of the textual representation 
         of the ERROR_STATUS value """
         text = []
-        for key, value, description in defs.ERROR_STATUS.items():
+        for key, value, description in list(defs.ERROR_STATUS.items()):
             if (error_type & value) != 0:
                 text.append(description['textDesc'])
         return text
@@ -126,8 +126,8 @@ class DynamixelInterface(object):
                 if state > 1:
                     raise Exception("CM-5 detected but not in Managed Mode")
                 break
-        print "%d : %d" % (self._stream.read_timeout,
-                           self._stream.write_timeout)
+        print("%d : %d" % (self._stream.read_timeout,
+                           self._stream.write_timeout))
         return state == 5
 
     def dump_statistics(self):
@@ -237,7 +237,7 @@ class DynamixelInterface(object):
         # user's 
         if error_status != 0 and not self._in_error_handler:
             self._in_error_handler = True
-            print ident, self.error_text(error_status)
+            print(ident, self.error_text(error_status))
             self.dynamixel_error(self, (ident, error_status))
             self._in_error_handler = False
         return (ident, data)
@@ -339,7 +339,7 @@ class DynamixelInterface(object):
                 return_packet = self.await_packet(ident, count)
                 retry = False
             except stream.TimeoutException:
-                print "TIMEOUT accessing servo ID: %d" % (ident)
+                print("TIMEOUT accessing servo ID: %d" % (ident))
                 self._stream.flush()
         return return_packet
 
@@ -494,7 +494,7 @@ class DynamixelInterface(object):
         if start_id > end_id or start_id < 0:
             raise ValueError("start_id must be 0 to end_id")
         ids = []
-        for ident in xrange(start_id, end_id + 1):
+        for ident in range(start_id, end_id + 1):
             if self.ping(ident):
                 ids.append(ident)
         return ids
@@ -528,7 +528,7 @@ class DynamixelNetwork (DynamixelInterface):
 
     def get_dynamixels(self):
         """ A list of dynamixels present on the network """
-        return self._dynamixel_map.values()
+        return list(self._dynamixel_map.values())
 
     dynamixels = property(get_dynamixels)
 
@@ -562,7 +562,7 @@ class DynamixelNetwork (DynamixelInterface):
         activity for the dynamixels that are synchronized
         """
         if value:
-            for (ident, servo) in self._dynamixel_map.items():
+            for (ident, servo) in list(self._dynamixel_map.items()):
                 servo.stop()
             self.synchronize()
         self._stopped = value
@@ -582,7 +582,7 @@ class DynamixelNetwork (DynamixelInterface):
         """
         data = None
         count = 0
-        for (ident, servo) in self._dynamixel_map.items():
+        for (ident, servo) in list(self._dynamixel_map.items()):
             if servo.changed:
                 if not self.stopped:
                     count += 1
@@ -605,7 +605,7 @@ class DynamixelNetwork (DynamixelInterface):
         
         Updates the cache value of the register for all Dynamixels.
         """
-        for (ident, servo) in self._dynamixel_map.items():
+        for (ident, servo) in list(self._dynamixel_map.items()):
             servo[register] = value
         self.write_register(DynamixelInterface.BROADCAST_ID,
                             register,

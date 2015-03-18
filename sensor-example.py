@@ -45,13 +45,13 @@ def main(settings):
     
 
     # Play a note (0-41)
-    print 'Playing a note ...'
+    print('Playing a note ...')
     sensor.buzzer_index = 19
 
     time.sleep(2)
 
     # Play one of the short sound sequences the S1 knows
-    print "Playing a tune ..."
+    print("Playing a tune ...")
     sensor.buzzer_time = 255
     sensor.buzzer_index = 1
 
@@ -59,16 +59,16 @@ def main(settings):
     
     #######################
     # Reading values from environment
-    print 'Reading values from the world ...'
+    print('Reading values from the world ...')
     
     # The sensor can hear itself play notes, so reset the counter
     sensor.sound_detected_count = 0
     
-    print "Left IR \tCenter IR\tRight IR\tTemperature\tVoltage"
+    print("Left IR \tCenter IR\tRight IR\tTemperature\tVoltage")
 
     for i in count(1):
         if i % 10 == 0:
-            print "CLAP TWICE TO EXIT"
+            print("CLAP TWICE TO EXIT")
         if sensor.sound_detected_count >= 2:
             sys.exit(0)
         # Get our sensor values
@@ -77,7 +77,7 @@ def main(settings):
         rir = sensor.right_ir_sensor_value
         temp = sensor.current_temperature
         volts = sensor.current_voltage
-        print lir, '\t\t', cir, '\t\t', rir, '\t\t', temp, '\t\t', volts
+        print(lir, '\t\t', cir, '\t\t', rir, '\t\t', temp, '\t\t', volts)
         time.sleep(.5)
         
 def validateInput(userInput, rangeMin, rangeMax):
@@ -87,7 +87,7 @@ def validateInput(userInput, rangeMin, rangeMax):
     try:
         inTest = int(userInput)
         if inTest < rangeMin or inTest > rangeMax:
-            print "ERROR: Value out of range [" + str(rangeMin) + '-' + str(rangeMax) + "]"
+            print("ERROR: Value out of range [" + str(rangeMin) + '-' + str(rangeMax) + "]")
             return None
     except ValueError:
         print("ERROR: Please enter an integer")
@@ -131,21 +131,21 @@ if __name__ == '__main__':
             portPrompt += "Enter Choice: "
             portChoice = None
             while not portChoice:                
-                portTest = raw_input(portPrompt)
+                portTest = input(portPrompt)
                 portTest = validateInput(portTest, 1, portCount)
                 if portTest:
                     portChoice = possiblePorts[portTest - 1]
 
         else:
             portPrompt = "Please enter the port name to which the USB2Dynamixel is connected: "
-            portChoice = raw_input(portPrompt)
+            portChoice = input(portPrompt)
     
         settings['port'] = portChoice
         
         # Baud rate
         baudRate = None
         while not baudRate:
-            brTest = raw_input("Enter baud rate [Default: 1000000 bps]:")
+            brTest = input("Enter baud rate [Default: 1000000 bps]:")
             if not brTest:
                 baudRate = 1000000
             else:
@@ -156,8 +156,8 @@ if __name__ == '__main__':
         # Save the output settings to a yaml file
         with open(settingsFile, 'w') as fh:
             yaml.dump(settings, fh)
-            print("Your settings have been saved to 'settings.yaml'. \nTo " +
+            print(("Your settings have been saved to 'settings.yaml'. \nTo " +
                    "change them in the future either edit that file or run " +
-                   "this example with -c.")
+                   "this example with -c."))
     
     main(settings)

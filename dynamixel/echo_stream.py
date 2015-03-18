@@ -20,8 +20,8 @@ Echo Stream module
 
 """
 
-import stream
-import event_handler
+from . import stream
+from . import event_handler
 
 class EchoStream( stream.Stream ):
     """A wrapper for a stream class that also has a event handler for echoing
