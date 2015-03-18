@@ -1,16 +1,16 @@
 # pydynamixel
 
 This is a Python version of the ForestMoon Dynamixel library originally written
-in C# by Scott Ferguson.
+in C# by Scott Ferguson. It was forked of the project, which is maintained by Ian Danforth at https://github.com/iandanforth/pydynamixel.
 
-The Python version was created for the Pi Robot Project
+The original Python version was created for the Pi Robot Project
 (mailto:patrick@pirobot.org) which lives at http://www.pirobot.org.
 
-This github fork of the project is maintained by Ian Danforth.
+This github fork aims at upgrading from Python 2.7 to Python 3.4 in order to make it interoperable with picochess (https://github.com/jromang/picochess).
 
 ## Prerequisites
 
-- Python 2.7 (Please file a ticket if you *really* need 2.6 or 3.* support)
+- Python 3.4
 - pip
 - pyserial
 - git
@@ -19,18 +19,16 @@ This github fork of the project is maintained by Ian Danforth.
 
 ## Library Installation
 
-You can install just the library from Pypi using pip.
-
-    $ sudo pip install dynamixel
+The installation of the original library (https://github.com/iandanforth/pydynamixel) from Pypi using pip seems to be broken. So, 
 
 ## Source Installation
 
 If you'd like to have access to the getting started examples or contribute to
 the library, you can clone this library locally.
 
-    $ git clone https://github.com/iandanforth/pydynamixel.git
+    $ git clone https://github.com/CBA2011/pydynamixel.git
 
-### Run the example
+### Run the example (same as text as that of Ian Danforth)
 
 - Connect your USB2Dynamixel to a USB port
 - Connect at least one dynamixel servo to that
