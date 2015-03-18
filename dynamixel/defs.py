@@ -21,7 +21,7 @@ Module wide definitions
 
 """
 
-import enumeration
+from . import enumeration
 
 ERROR_STATUS = enumeration.Enumeration( [
     ('None', 0x0, {'textDesc': "None"}),

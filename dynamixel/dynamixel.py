@@ -1,5 +1,3 @@
-#!/usr/bin/env python2.6 
-
 """
 This is a Python version of the ForestMoon Dynamixel library originally
 written in C# by Scott Ferguson.
@@ -21,13 +19,13 @@ Dynamixel interface
 
 """
 
-import defs
+from . import defs
 import time
-import dynamixel_network
+from . import dynamixel_network
 import re
 import operator
 
-from defs import DEVICE
+from .defs import DEVICE
 
 AX12 = DEVICE['AX12']
 AXS1 = DEVICE['AXS1']
@@ -69,7 +67,7 @@ class SensorModule(object):
     def __getattribute__(self, name):
         
         # Abuse global scope a bit to save a ton of work
-        if name in AXS1PropNames.keys():
+        if name in list(AXS1PropNames.keys()):
             regName = AXS1PropNames[name]
             return self._get_register_value(AXS1[regName])
         else:
@@ -78,7 +76,7 @@ class SensorModule(object):
     def __setattr__(self, name, value):
         
         # Abuse global scope a bit to save a ton of work
-        if name in AXS1PropNames.keys():
+        if name in list(AXS1PropNames.keys()):
             regName = AXS1PropNames[name]
             self.set_register_value(AXS1[regName], value)
         else:
@@ -304,7 +302,7 @@ class Dynamixel (object):
             if self._synchronized:
                 if register == AX12.MovingSpeed and value == 0:
                     value = 1
-                    print "Moving speed %d " % (value)
+                    print("Moving speed %d " % (value))
                 self[register] = value
                 self.changed = True
             elif register in [AX12.ModelNumber, 

@@ -22,11 +22,12 @@ try:
     # PySerial Module
     import serial
 except:
-    print "This module requires the pySerial to be installed \
-to use the Serial Stream"
+    print("This module requires the pySerial to be installed \
+to use the Serial Stream")
 
+import logging
 
-from stream import Stream, TimeoutException
+from .stream import Stream, TimeoutException
 
 class SerialStream( Stream ):
     """ A stream using the pyserial interface """
@@ -57,9 +58,17 @@ class SerialStream( Stream ):
         """ Write buf to the port 
         buf - string or list of bytes
         """
-        if isinstance( buf, list ):
-            buf = ''.join( [chr( c ) for c in buf] )
-        self.port.write( buf )
+        if isinstance( buf, list ) or isinstance( buf, str ):
+            buf2 = list()
+            for c in buf:
+                if isinstance( c, str ):
+                    c = ord(c)
+                buf2.append(c)
+            logging.debug((type(buf2), buf2))
+            self.port.write( buf2 )
+        else:
+            logging.warn("{} not converted by {}.write! Nothing sent..".format(type(buf),str(self)))
+
     def get_read_timeout( self ):
         """ Get the read timeout """
         return self.port.timeout 

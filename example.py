@@ -31,13 +31,13 @@ def main(settings):
         net._dynamixel_map[servoId] = newDynamixel
     
     if not net.get_dynamixels():
-      print 'No Dynamixels Found!'
+      print('No Dynamixels Found!')
       sys.exit(0)
     else:
-      print "...Done"
+      print("...Done")
     
     # Prompt the user to move servos.
-    answer = raw_input("Would you like to move all the servos to the home position?"
+    answer = input("Would you like to move all the servos to the home position?"
                    "\nWARNING: If servos are obstructed this could damage them "
                    "\nor things in their path. [y/N] ")
     if answer in ['y', 'Y', 'yes', 'Yes', 'YES']:
@@ -62,7 +62,7 @@ def validateInput(userInput, rangeMin, rangeMax):
     try:
         inTest = int(userInput)
         if inTest < rangeMin or inTest > rangeMax:
-            print "ERROR: Value out of range [" + str(rangeMin) + '-' + str(rangeMax) + "]"
+            print("ERROR: Value out of range [" + str(rangeMin) + '-' + str(rangeMax) + "]")
             return None
     except ValueError:
         print("ERROR: Please enter an integer")
@@ -106,21 +106,21 @@ if __name__ == '__main__':
             portPrompt += "Enter Choice: "
             portChoice = None
             while not portChoice:                
-                portTest = raw_input(portPrompt)
+                portTest = input(portPrompt)
                 portTest = validateInput(portTest, 1, portCount)
                 if portTest:
                     portChoice = possiblePorts[portTest - 1]
 
         else:
             portPrompt = "Please enter the port name to which the USB2Dynamixel is connected: "
-            portChoice = raw_input(portPrompt)
+            portChoice = input(portPrompt)
     
         settings['port'] = portChoice
         
         # Baud rate
         baudRate = None
         while not baudRate:
-            brTest = raw_input("Enter baud rate [Default: 1000000 bps]:")
+            brTest = input("Enter baud rate [Default: 1000000 bps]:")
             if not brTest:
                 baudRate = 1000000
             else:
@@ -131,7 +131,7 @@ if __name__ == '__main__':
         # Servo ID
         highestServoId = None
         while not highestServoId:
-            hsiTest = raw_input("Please enter the highest ID of the connected servos: ")
+            hsiTest = input("Please enter the highest ID of the connected servos: ")
             highestServoId = validateInput(hsiTest, 1, 255)
         
         settings['highestServoId'] = highestServoId
@@ -148,25 +148,25 @@ if __name__ == '__main__':
         net = dynamixel.DynamixelNetwork(serial)
         
         # Ping the range of servos that are attached
-        print "Scanning for Dynamixels..."
+        print("Scanning for Dynamixels...")
         net.scan(1, highestServoId)
 
         settings['servoIds'] = []
-        print "Found the following Dynamixels IDs: "
+        print("Found the following Dynamixels IDs: ")
         for dyn in net.get_dynamixels():
-            print dyn.id
+            print(dyn.id)
             settings['servoIds'].append(dyn.id)
 
         # Make sure we actually found servos
         if not settings['servoIds']:
-          print 'No Dynamixels Found!'
+          print('No Dynamixels Found!')
           sys.exit(0)
 
         # Save the output settings to a yaml file
         with open(settingsFile, 'w') as fh:
             yaml.dump(settings, fh)
-            print("Your settings have been saved to 'settings.yaml'. \nTo " +
+            print(("Your settings have been saved to 'settings.yaml'. \nTo " +
                    "change them in the future either edit that file or run " +
-                   "this example with -c.")
+                   "this example with -c."))
     
     main(settings)

@@ -48,7 +48,7 @@ class Enumeration( object ):
             # add to value set to ensure non-duplicate values
             values.add( value )
         # populate the attributes of the class
-        for key, value in self._values.items():
+        for key, value in list(self._values.items()):
             object.__setattr__( self, key, value )
     def __getitem__( self, key ):
         """ Lookup an item based on a string 
@@ -77,7 +77,7 @@ class Enumeration( object ):
         Returns key as a string
         Throws KeyError if key is not associated with a value
         """
-        for key, val in self._values.items():
+        for key, val in list(self._values.items()):
             if val == value:
                 return key
         raise KeyError( "Cannot find associated key in enumeration" )
@@ -104,10 +104,10 @@ class Enumeration( object ):
         raise KeyError( "Cannot find associated description" )
     def keys( self ):
         """ Return the keys in the enumeration as a list of strings """
-        return self._values.keys()
+        return list(self._values.keys())
     def values( self ):
         """ Return the values in the enumeration as a list of values """
-        return self._values.values()
+        return list(self._values.values())
     def __iter__( self ):
         """ Return the iterator for the Enumeration """
         return iter( self._values )
@@ -115,4 +115,4 @@ class Enumeration( object ):
         """ Return the number of elements in the enumeration """
         return len( self._values )
     def __repr__( self ):
-        return "Enumeration( %r )" % (self.items())
+        return "Enumeration( %r )" % (list(self.items()))
