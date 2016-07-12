@@ -14,7 +14,7 @@ This free software is distributed under the GNU General Public License.
 See http://www.gnu.org/licenses/gpl.html for details.
 This license restricts your usage of the software in derivative works.
 
-* * * * * 
+* * * * *
 
 Dynamixel Network module
 
@@ -24,7 +24,7 @@ from . import defs
 from . import stream
 from . import event_handler
 import time
-# from . import dynamixel
+from . import dynamixel
 
 from .defs import DEVICE
 
@@ -53,7 +53,7 @@ class DynamixelInterface(object):
 
     @staticmethod
     def error_text(error_type):
-        """ Returns a list of the textual representation 
+        """ Returns a list of the textual representation
         of the ERROR_STATUS value """
         text = []
         for key, value, description in list(defs.ERROR_STATUS.items()):
@@ -65,9 +65,9 @@ class DynamixelInterface(object):
     def register_reserved(addr):
         """ Test to see if a register is reserved """
         return addr in [0xA,0x13]
-    
+
     def enter_toss_mode(self):
-        """ Try to put the CM-5 into Toss Mode 
+        """ Try to put the CM-5 into Toss Mode
 
         Returns true on success
         """
@@ -77,31 +77,31 @@ class DynamixelInterface(object):
         while state < 5:
             try:
                 if state == 0:
-                    # send a CR and look for a response from a CM-5 
+                    # send a CR and look for a response from a CM-5
                     # in manage mode
                     self._stream.write_byte('\r')
                     state = 1
                 elif state == 1:
                     # look for a response from a CM-5
-                    buf += self._stream.read_byte() 
+                    buf += self._stream.read_byte()
                     if len(buf) >= 3 and buf[-3:] == "[CM":
                         # a CM-5 that has just been put into manage mode
-                        # will respond to the first CR with a version 
+                        # will respond to the first CR with a version
                         # string, e.g. "[CM-5 Version 1.15]" lengthen the
                         # timeout because the CM-5 will scan for Dynamixels
                         self._stream.read_timeout = 750
                         state = 2
                     if len(buf) >= 3 and buf[-3:] == "[CI":
-                        # a CM-5 in manage mode that has already scanned 
+                        # a CM-5 in manage mode that has already scanned
                         # will respond with a prompt string containing the
                         # ID of the current Dynamixel, e.g. "[CID:001(0x01)]"
                         # restore the shorter timeout
                         self._stream.read_timeout = save_timeout
                         state = 3
                 elif state == 2:
-                    buf += self._stream.read_byte() 
+                    buf += self._stream.read_byte()
                     if len(buf) >= 3 and buf[-3:] == "[CI":
-                        # a CM-5 in manage mode that has already scanned 
+                        # a CM-5 in manage mode that has already scanned
                         # will respond with a prompt string containing the
                         # ID of the current Dynamixel, e.g. "[CID:001(0x01)]"
                         # restore the shorter timeout
@@ -132,10 +132,10 @@ class DynamixelInterface(object):
 
     def dump_statistics(self):
         """ Return a list of textual statistics
-        
+
         Returns a list of strings
         """
-        
+
         result = []
         if self._response_count != 0:
             avg_response_time = self._response_total_elapsed / \
@@ -171,14 +171,14 @@ class DynamixelInterface(object):
         """
 
         retry = True
-        # read packet is only ever called immediately following a write 
-        # instruction (sent packet) so we can use this opportunity to 
-        # time the response from dynamixel 
+        # read packet is only ever called immediately following a write
+        # instruction (sent packet) so we can use this opportunity to
+        # time the response from dynamixel
         start_time = time.time()
 
         # set an invalid id for error return cases
         ident = 0xFF
-        ## 
+        ##
         ## Status packet returned from dynamixel module
         ## 0     1     2     3     4     5     5 + data-length
         ## 0xFF  0xFF  id    len   err   data  checksum
@@ -193,7 +193,7 @@ class DynamixelInterface(object):
         self._response_count += 1
         self._response_max_elapsed = max(self._response_max_elapsed, \
                                               elapsed_time)
-        
+
         if byte != 0xFF:
             self._error_count_1st_header_byte += 1
             return (ident, None)
@@ -203,7 +203,7 @@ class DynamixelInterface(object):
         if byte != 0xFF:
             self._error_count_2nd_header_byte += 1
             return (ident, None)
-        
+
         # id or third header
         byte = ord(self._stream.read_byte())
         if byte == 0xFF:
@@ -213,7 +213,7 @@ class DynamixelInterface(object):
         ident = byte
 
         # packet length includes data-length + 2
-        length = ord(self._stream.read_byte()) 
+        length = ord(self._stream.read_byte())
 
         if length < 0:
             self._error_count_invalid_length += 1
@@ -233,8 +233,8 @@ class DynamixelInterface(object):
         # CONSIDER: Could validate the checksum and reject the packet
         checksum = ord(self._stream.read_byte())
         # let anyone listing know about any errors reported in the packet
-        # use the InErrorHandler flag to avoid recursion from the 
-        # user's 
+        # use the InErrorHandler flag to avoid recursion from the
+        # user's
         if error_status != 0 and not self._in_error_handler:
             self._in_error_handler = True
             print(ident, self.error_text(error_status))
@@ -263,9 +263,9 @@ class DynamixelInterface(object):
                 self._error_count_unexpected_ident += 1
             if plen != length:
                 self._error_count_unexpected_length += 1
-            
+
     def write_instruction(self, ident, instruction, params=None):
-        """Send a command packet instruction 
+        """Send a command packet instruction
 
         ident - the id of the destination dynamixel or BROADCAST_ID to send to all
         ins - instruction to send
@@ -277,7 +277,7 @@ class DynamixelInterface(object):
         # 0      1      2    3        4            4 + data-length
         # [0xFF] [0xFF] [id] [length] [...data...] [checksum]
         #
-        # header bytes & id        
+        # header bytes & id
         if params == None:
             params = []
         if not isinstance(params, list):
@@ -286,26 +286,27 @@ class DynamixelInterface(object):
         cmd.append(0xFF)
         cmd.append(ident)
         # length is data-length + 2
-        cmd.append(len(params) + 2)        
+        cmd.append(len(params) + 2)
         cmd.append(instruction)
         # parameter bytes
         cmd = cmd + params
         # checksum
         chksum = 0
         for byte in cmd[2:]:
+            byte = int(byte)
             chksum += byte
             chksum &= 0xFF
         chksum = (~chksum) & 0xFF
         cmd.append(chksum)
         # convert from bytes to a string
-        cmd = ''.join([chr(c & 0xFF) for c in cmd])
+        cmd = ''.join([chr(int(c) & 0xFF) for c in cmd])
         # write the string
         self._stream.write(cmd)
         self._stream.flush()
 
     def ping(self, ident):
         """ Check the presence of a specific dynamixel on the network
-        
+
         ident - identifier of a dynamixel to ping
         """
         self.write_instruction(ident, defs.INSTRUCTION.Ping)
@@ -317,7 +318,7 @@ class DynamixelInterface(object):
 
     def _read_data(self, ident, start_address, count):
         """Read register data from a Dynamixel.
-        
+
         id - the id of the dynamixel to read
         start_address - the starting register to read from
         count - the number of bytes to read
@@ -327,7 +328,7 @@ class DynamixelInterface(object):
         The count is for the number of bytes, not the number of registers.
         This can also be used to read many registers at once.
         """
-        
+
         return_packet = None
         retry = True
         # the start address and count from the parameters of the command
@@ -345,10 +346,10 @@ class DynamixelInterface(object):
 
     def read_register(self, ident, register, register_length):
         """Read the value of one logical register
-        
+
         ident - the id of the Dynamixel to read
         reg - logical register to read
-        
+
         Returns the integer value of the logical register
         """
         data = self._read_data(ident, register, register_length)
@@ -363,7 +364,7 @@ class DynamixelInterface(object):
         ident - the id of the dynamixel
         registers - A list of tuples sorted by register address. Example:
                     [(RegAddress, RegLength), (RegAddress2, RegLength2),]
-        
+
         returns:
         a list of register values
 
@@ -371,7 +372,7 @@ class DynamixelInterface(object):
         # index of first and last register
         first_register = registers[0][0]
         last_register, last_register_length = registers[-1]
-        
+
         # calc number of bytes as delta based on addresses
         byte_count = last_register + last_register_length - first_register
 
@@ -399,11 +400,11 @@ class DynamixelInterface(object):
 
     def write_data(self, ident, start_address, params, deferred):
         """Write register data
-        
+
         ident - dynamixel to write to
         start_address - the starting register to write to
         params - list of bytes to be written
-        deferred - if true the dynamixel will store the request 
+        deferred - if true the dynamixel will store the request
                    until the action  command is received
                    """
         if not isinstance(params, list):
@@ -422,12 +423,12 @@ class DynamixelInterface(object):
 
     def write_register(self, ident, register, register_length, value, deferred):
         """Write data to one logical register
-        
+
         ident - dynamixel to write to
         register - the register to write to
         register_length - [1,2] How many register addresses the value uses
         value - the integer value to write
-        deferred - if true the dynamixel will store the request until the action 
+        deferred - if true the dynamixel will store the request until the action
                    command is received
                    """
         if not isinstance(value, int):
@@ -439,15 +440,15 @@ class DynamixelInterface(object):
             self.write_data(ident, register, values, deferred)
 
     def action(self):
-        """Broadcasta an action instruction for all dynamixels 
+        """Broadcasta an action instruction for all dynamixels
         with deferred writes pending
 
         """
         self.write_instruction(DynamixelInterface.BROADCAST_ID,
                                  defs.INSTRUCTION.Action, None)
-    
+
     def sync_write(self, start_address, number_of_dynamixels, params):
-        """ Write to multiple registers on multiple Dynamixels 
+        """ Write to multiple registers on multiple Dynamixels
         using one instruction.
 
         start_address = starting register to write to
@@ -456,14 +457,14 @@ class DynamixelInterface(object):
         dynamixel
 
         Note:
-        This function provides the most efficient way of updating the same 
-        registers on each of many different Dynaixels with different values 
+        This function provides the most efficient way of updating the same
+        registers on each of many different Dynaixels with different values
         at the same time.
 
-        The length of the 'parms' data will determine the number of sequential 
+        The length of the 'parms' data will determine the number of sequential
         registers being written to.
 
-        For each Dynamixel the 'parms' data must include the id followed 
+        For each Dynamixel the 'parms' data must include the id followed
         by the register data.
         """
         if len(params) % number_of_dynamixels != 0:
@@ -484,7 +485,7 @@ class DynamixelInterface(object):
         Returns a list of ids on the network
 
         Scanning for all possible IDs (0 thru 254) can be time consuming.
-        So if the range can be constrained to predetermined values it can 
+        So if the range can be constrained to predetermined values it can
         speed up the process.
 
         throws ValueError on arguments out of range
@@ -498,15 +499,15 @@ class DynamixelInterface(object):
             if self.ping(ident):
                 ids.append(ident)
         return ids
-    
+
 class DynamixelNetwork (DynamixelInterface):
-    """ An abstract model of a Dynamixel network represented as a 
+    """ An abstract model of a Dynamixel network represented as a
     collection of Dynamixel objects.
     """
 
     def __init__(self, strm):
         """ The Constructor
-        stream - the stream to exchange command and status packets with 
+        stream - the stream to exchange command and status packets with
         the dynamixel network
         """
         DynamixelInterface.__init__(self, strm)
@@ -515,10 +516,10 @@ class DynamixelNetwork (DynamixelInterface):
 
     def __getitem__(self, ident):
         """ array access to the dynamixels, indexed by id
-        
+
         ident - id to retrieve
 
-        returns the dynamixel object with that id or None if none 
+        returns the dynamixel object with that id or None if none
         present on the network
         """
         if ident in self._dynamixel_map:
@@ -545,7 +546,7 @@ class DynamixelNetwork (DynamixelInterface):
         it will rebuild the list and create new Dynamixel instances to fill it,
         any previously retrieved Dynamixels.
         for all possible IDs (0 thru 254) can be time consuming.
-        So if the range can be constrained to predetermined values it can 
+        So if the range can be constrained to predetermined values it can
         speed up the process.
         """
         self._dynamixel_map = {}
@@ -570,11 +571,11 @@ class DynamixelNetwork (DynamixelInterface):
     stopped = property(_get_stopped, _set_stopped)
 
     def synchronize(self):
-        """Send GoalPosition and MovingSpeed data for all 
+        """Send GoalPosition and MovingSpeed data for all
         Dynamixels in Synchronized mode.
 
-        This function collects all the changed GoalPosition and 
-        MovingSpeed data that has been stored for each Dynamixel 
+        This function collects all the changed GoalPosition and
+        MovingSpeed data that has been stored for each Dynamixel
         flagged as Synchronized and sends it all out at once
         using a SyncWrite instruction.
 
@@ -602,7 +603,7 @@ class DynamixelNetwork (DynamixelInterface):
         register - The logical register to write.
         register_length - The length in bytes of that register
         value - The integer value to write.
-        
+
         Updates the cache value of the register for all Dynamixels.
         """
         for (ident, servo) in list(self._dynamixel_map.items()):
@@ -615,7 +616,7 @@ class DynamixelNetwork (DynamixelInterface):
 
     def dynamixel_id_change(self, servo, new_id):
         """ Prepare for a pending change in the Id of a dynamixel
-        
+
         Note: you must change the dynamixel object to new_id
         """
         if new_id in self._dynamixel_map:

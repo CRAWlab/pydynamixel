@@ -5,18 +5,18 @@ import subprocess
 import optparse
 import yaml
 
-""" 
+"""
 This script will discover available USB ports to which the USB2Dynamixel may
 be attached. It will also help you discover the list of servos that are in the
 network. Once that has been done these values will be stored in  a local
 settings.yaml file.
 
-You will then be shown all of the found servo ids, and be asked if you want to 
+You will then be shown all of the found servo ids, and be asked if you want to
 set them all to the home position (512).
 """
 
 def main(settings):
-    
+
     # Establish a serial connection to the dynamixel network.
     # This usually requires a USB2Dynamixel
     serial = dynamixel.SerialStream(port=settings['port'],
@@ -29,13 +29,13 @@ def main(settings):
     for servoId in settings['servoIds']:
         newDynamixel = dynamixel.Dynamixel(servoId, net)
         net._dynamixel_map[servoId] = newDynamixel
-    
+
     if not net.get_dynamixels():
       print('No Dynamixels Found!')
       sys.exit(0)
     else:
       print("...Done")
-    
+
     # Prompt the user to move servos.
     answer = input("Would you like to move all the servos to the home position?"
                    "\nWARNING: If servos are obstructed this could damage them "
@@ -46,7 +46,7 @@ def main(settings):
         for actuator in net.get_dynamixels():
             actuator.moving_speed = 50
             actuator.torque_enable = True
-            actuator.torque_limit = 800 
+            actuator.torque_limit = 800
             actuator.max_torque = 800
             actuator.goal_position = 512
 
@@ -67,19 +67,19 @@ def validateInput(userInput, rangeMin, rangeMax):
     except ValueError:
         print("ERROR: Please enter an integer")
         return None
-    
+
     return inTest
 
 if __name__ == '__main__':
-    
+
     parser = optparse.OptionParser()
     parser.add_option("-c", "--clean",
                       action="store_true", dest="clean", default=False,
                       help="Ignore the settings.yaml file if it exists and \
                       prompt for new settings.")
-    
+
     (options, args) = parser.parse_args()
-    
+
     # Look for a settings.yaml file
     settingsFile = 'settings.yaml'
     if not options.clean and os.path.exists(settingsFile):
@@ -94,10 +94,10 @@ if __name__ == '__main__':
             try:
                 possiblePorts = subprocess.check_output('ls /dev/ | grep -i usb',
                                                         shell=True).split()
-                possiblePorts = ['/dev/' + port for port in possiblePorts]
+                possiblePorts = ['/dev/' + port.decode("utf-8") for port in possiblePorts]
             except subprocess.CalledProcessError:
                 sys.exit("USB2Dynamixel not found. Please connect one.")
-                
+
             counter = 1
             portCount = len(possiblePorts)
             for port in possiblePorts:
@@ -105,7 +105,7 @@ if __name__ == '__main__':
                 counter += 1
             portPrompt += "Enter Choice: "
             portChoice = None
-            while not portChoice:                
+            while not portChoice:
                 portTest = input(portPrompt)
                 portTest = validateInput(portTest, 1, portCount)
                 if portTest:
@@ -114,9 +114,9 @@ if __name__ == '__main__':
         else:
             portPrompt = "Please enter the port name to which the USB2Dynamixel is connected: "
             portChoice = input(portPrompt)
-    
+
         settings['port'] = portChoice
-        
+
         # Baud rate
         baudRate = None
         while not baudRate:
@@ -125,15 +125,15 @@ if __name__ == '__main__':
                 baudRate = 1000000
             else:
                 baudRate = validateInput(brTest, 9600, 1000000)
-                    
+
         settings['baudRate'] = baudRate
-        
+
         # Servo ID
         highestServoId = None
         while not highestServoId:
             hsiTest = input("Please enter the highest ID of the connected servos: ")
             highestServoId = validateInput(hsiTest, 1, 255)
-        
+
         settings['highestServoId'] = highestServoId
 
 
@@ -146,7 +146,7 @@ if __name__ == '__main__':
                                         timeout=1)
         # Instantiate our network object
         net = dynamixel.DynamixelNetwork(serial)
-        
+
         # Ping the range of servos that are attached
         print("Scanning for Dynamixels...")
         net.scan(1, highestServoId)
@@ -168,5 +168,5 @@ if __name__ == '__main__':
             print(("Your settings have been saved to 'settings.yaml'. \nTo " +
                    "change them in the future either edit that file or run " +
                    "this example with -c."))
-    
+
     main(settings)
