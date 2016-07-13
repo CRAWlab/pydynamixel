@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.6
+
 """
 This is a Python version of the ForestMoon Dynamixel library originally
 written in C# by Scott Ferguson.
@@ -219,15 +219,20 @@ class DynamixelInterface(object):
             self._error_count_invalid_length += 1
 
         error_status = ord(self._stream.read_byte())
-        data = ""
+
+        data = []
         # remove error and checksum bytes
         length -= 2
+
         if length > 0:
             while length > 0:
                 buf = self._stream.read(length)
                 length -= len(buf)
-                data += buf
-        data = [ord(byte) for byte in data]
+                [data.append(i) for i in buf]
+
+        data = [ord(chr(byte)) for byte in data]
+
+
         # XXX below code/comment was in the original code
         # get the checksum byte
         # CONSIDER: Could validate the checksum and reject the packet
